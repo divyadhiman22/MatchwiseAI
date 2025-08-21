@@ -1,42 +1,3 @@
-// import { UserModel } from "../models/user-model.js";
-// import { compareHash, encryptPassword } from "../utils/services/password-hash.js";
-// import { generateToken } from "../utils/services/token.js";
-
-// export const register = async (userObject)=>{
-//     try{
-//         userObject.password = encryptPassword(userObject.password);
-//     const doc = await UserModel.create(userObject);
-//     if(doc && doc._id){
-//         return "User Register SuccessFully";
-//     }
-// }
-// catch(err){
-//     throw err;
-// }
-// }
-// export const login = async (userObject)=>{
-//    try{
-//     const doc =  await UserModel.findOne({email:userObject.email}).exec();
-//    if(doc && doc.email){
-//         if(compareHash(userObject.password, doc.password)){
-//             const token = generateToken(doc.email);
-//             return {message:"Welcome "+doc.name,role:doc.role, token : token};
-//         }
-//         else{
-//             return {message:"Invalid Email or Password"};
-//         }
-//    }
-//    else{
-//          return "Invalid Email or Password";
-//    }
-// }
-// catch(err){
-//     throw new Error("Invalid User Credentials");
-// }
-// }
-
-
-// *******************************************************************************
 import { UserModel } from "../models/user-model.js";
 import { compareHash, encryptPassword } from "../utils/services/password-hash.js";
 import { generateToken } from "../utils/services/token.js";
@@ -48,18 +9,14 @@ import admin from "../firebase-config.js";
 
 const auth = admin.auth();
 
-//___________________________
-// REGISTER
-//___________________________
+
 export const register = async (userObject) => {
   try {
-    // check if email already exists
     const existing = await UserModel.findOne({ email: userObject.email }).exec();
     if (existing) {
       throw new Error("Email already exists");
     }
 
-    // generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
     await OTPModel.create({ email: userObject.email, otp });
@@ -71,9 +28,7 @@ export const register = async (userObject) => {
   }
 };
 
-//___________________________
-// VERIFY OTP
-//___________________________
+
 export const verifyOTP = async ({ email, otp, name, password }) => {
   try {
     const validOTP = await OTPModel.findOne({ email, otp });
@@ -81,18 +36,15 @@ export const verifyOTP = async ({ email, otp, name, password }) => {
       throw new Error("Invalid or expired OTP");
     }
 
-    // Hash password
     const encryptedPass = await encryptPassword(password);
 
-    // ✅ Use correct fields
     const userDoc = await UserModel.create({
-      name,          // from request
+      name,     
       email,
       password: encryptedPass,
       role: "user",
     });
 
-    // Delete OTP after success
     await OTPModel.deleteOne({ email });
 
     return {
@@ -107,9 +59,6 @@ export const verifyOTP = async ({ email, otp, name, password }) => {
 };
 
 
-//___________________________
-// LOGIN
-//___________________________
 export const login = async (userObject) => {
   try {
     const doc = await UserModel.findOne({ email: userObject.email }).exec();
@@ -128,9 +77,7 @@ export const login = async (userObject) => {
   }
 };
 
-//___________________________
-// GOOGLE LOGIN
-//___________________________
+
 export const googleLogin = async ({ idToken }) => {
   try {
     if (!idToken) {
@@ -166,9 +113,7 @@ export const googleLogin = async ({ idToken }) => {
   }
 };
 
-//___________________________
-// FORGOT PASSWORD
-//___________________________
+
 export const forgotPassword = async ({ email }) => {
   try {
     const user = await UserModel.findOne({ email });
@@ -209,9 +154,7 @@ export const forgotPassword = async ({ email }) => {
   }
 };
 
-//___________________________
-// RESET PASSWORD
-//___________________________
+
 export const resetPassword = async (token, newPassword) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
