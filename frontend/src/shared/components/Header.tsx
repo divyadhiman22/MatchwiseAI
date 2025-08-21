@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [role, setRole] = useState(localStorage.getItem("role"));
   const [menuOpen, setMenuOpen] = useState(false);
-  const [googleUser, setGoogleUser] = useState<User | null>(null);
+  const [, setGoogleUser] = useState<User | null>(null);
 
   useEffect(() => {
     const handleStorageChange = () => {
