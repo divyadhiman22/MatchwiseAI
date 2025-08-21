@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "types": ["node"],
+    "moduleResolution": "node",
+    "target": "esnext", // ensure this is compatible
+    // optionally:
+    "baseUrl": ".", 
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}
