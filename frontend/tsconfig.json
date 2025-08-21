@@ -5,10 +5,11 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+        "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "types": ["node"],
     "moduleResolution": "node",
-    "target": "esnext", // ensure this is compatible
-    // optionally:
+    "target": "esnext", 
     "baseUrl": ".", 
     "paths": {
       "@/*": ["src/*"]
