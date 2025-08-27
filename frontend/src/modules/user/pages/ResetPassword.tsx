@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -8,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { doResetPassword } from "../api/user-api";
+import { resetPasswordSchema } from "../validations/resgister-validation";
+import z from "zod";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -15,16 +18,20 @@ export default function ResetPassword() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await doResetPassword(token!, { newPassword });
-      toast.success(res.data.message);
-      navigate("/login");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
+  e.preventDefault();
+  try {
+    resetPasswordSchema.parse({ newPassword });
+    const res = await doResetPassword(token!, { newPassword });
+    toast.success(res.data.message);
+    navigate("/login");
+  } catch (err: any) {
+    if (err instanceof z.ZodError) {
+      toast.error(err.issues[0].message);
+    } else {
       toast.error(err.response?.data?.message || "Password reset failed");
     }
-  };
+  }
+};
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900">

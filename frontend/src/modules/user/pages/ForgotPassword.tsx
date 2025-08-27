@@ -9,21 +9,28 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { doForgotPassword } from "../api/user-api";
+import { forgotPasswordSchema } from "../validations/resgister-validation";
+import z from "zod";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await doForgotPassword({ email });
-      toast.success(res.data.message);
-      navigate("/login");
-    } catch (err: any) {
+  e.preventDefault();
+  try {
+    forgotPasswordSchema.parse({ email });
+    const res = await doForgotPassword({ email });
+    toast.success(res.data.message);
+    navigate("/login");
+  } catch (err: any) {
+    if (err instanceof z.ZodError) {
+      toast.error(err.issues[0].message);
+    } else {
       toast.error(err.response?.data?.message || "Failed to send reset email");
     }
-  };
+  }
+};
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900">
