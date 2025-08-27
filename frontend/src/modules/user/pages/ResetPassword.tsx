@@ -12,18 +12,21 @@ import { doResetPassword } from "../api/user-api";
 import { resetPasswordSchema } from "../validations/resgister-validation";
 import z from "zod";
 
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+
 export default function ResetPassword() {
   const { token } = useParams();
   const [newPassword, setNewPassword] = useState("");
-  const [error, setError] = useState(""); 
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); 
+    setError("");
 
     try {
-      resetPasswordSchema.parse({ newPassword }); 
+      resetPasswordSchema.parse({ newPassword });
       const res = await doResetPassword(token!, { newPassword });
       toast.success(res.data.message);
       navigate("/login");
@@ -44,17 +47,24 @@ export default function ResetPassword() {
             Reset Password
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+            <div className="relative">
               <Label htmlFor="password" className="text-white">
                 New Password
               </Label>
               <Input
                 id="password"
-                type="password"
-                className="bg-white/10 border-white/20 text-white placeholder-white"
+                type={showPassword ? "text" : "password"}
+                className="bg-white/10 border-white/20 text-white placeholder-white pr-10"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-9 text-white focus:outline-none"
+              >
+                {showPassword ? <AiFillEye size={20} /> : <AiFillEyeInvisible size={20} />}
+              </button>
               {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
             </div>
 
